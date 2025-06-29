@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="cache-control" content="no-store" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de Alerta</title>
+  <style>
+    body {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    label {
+      margin-top: 12px;
+      display: block;
+      font-weight: bold;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #mensaje {
+      color: green;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Formulario de Alerta</h1>
+
+  {% if mensaje %}
+    <p id="mensaje">{{ mensaje }}</p>
+    <script>
+      setTimeout(() => document.getElementById("mensaje").style.display = "none", 5000);
+    </script>
+  {% endif %}
+
+  <form method="post">
+    <input type="hidden" id="id_alerta" name="id_alerta" />
+
+    <label for="seccion">Sección:</label>
+    <select id="seccion" name="seccion" required>
+      <option value="">Seleccione una sección</option>
+      {% for seccion in secciones %}
+        <option value="{{ seccion }}">{{ seccion }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="alumno">Nombre Alumno:</label>
+    <select id="alumno" name="alumno" required>
+      <option value="">Seleccione un alumno</option>
+    </select>
+
+    <label for="accion">Acción Ejecutada:</label>
+    <select id="accion" name="accion" required>
+      <option value="">Seleccione una acción</option>
+      {% for accion in acciones %}
+        <option value="{{ accion }}">{{ accion }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="dimension">Dimensión:</label>
+    <select id="dimension" name="dimension" required>
+      <option value="">Seleccione una dimensión</option>
+      {% for dimension in dimensiones %}
+        <option value="{{ dimension }}">{{ dimension }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="motivo">Motivo Alerta:</label>
+    <select id="motivo" name="motivo" required>
+      <option value="">Seleccione un motivo</option>
+    </select>
+
+    <label for="observaciones">Observaciones:</label>
+    <textarea id="observaciones" name="observaciones" rows="4" cols="40"></textarea>
+
+    <label for="consecutivo">Nº Consecutivo:</label>
+    <input type="number" id="consecutivo" name="consecutivo" required>
+
+    <label for="profesor">Nombre Profesor:</label>
+    <select id="profesor" name="profesor" required>
+      <option value="">Seleccione un profesor</option>
+      {% for profesor in profesores %}
+        <option value="{{ profesor }}">{{ profesor }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="hidden" id="timestamp" name="timestamp" />
+    <button type="submit">Enviar alerta</button>
+  </form>
+
+  <script>
+    const alumnos = {{ alumnos | tojson }};
+    const seccionField = document.getElementById('seccion');
+    const alumnoField = document.getElementById('alumno');
+
+    seccionField.addEventListener('change', function () {
+      const seleccion = this.value;
+      alumnoField.innerHTML = '<option value="">Seleccione un alumno</option>';
+      const filtrados = alumnos.filter(a => a.seccion === seleccion);
+      filtrados.forEach(a => {
+        const opcion = document.createElement('option');
+        opcion.value = a.alumno;
+        opcion.textContent = a.alumno;
+        alumnoField.appendChild(opcion);
+      });
+    });
+
+    const motivos = {{ motivos | tojson }};
+    const dimensionField = document.getElementById('dimension');
+    const motivoField = document.getElementById('motivo');
+
+    dimensionField.addEventListener('change', function () {
+      const seleccion = this.value;
+      motivoField.innerHTML = '<option value="">Seleccione un motivo</option>';
+      const filtrados = motivos.filter(m => m.dimension === seleccion);
+      filtrados.forEach(m => {
+        const opcion = document.createElement('option');
+        opcion.value = m.motivo;
+        opcion.textContent = m.motivo;
+        motivoField.appendChild(opcion);
+      });
+    });
+
+    document.querySelector('form').addEventListener('submit', function () {
+      document.getElementById('timestamp').value = new Date().toISOString();
+    });
+  </script>
+</body>
+</html>
