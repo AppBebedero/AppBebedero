@@ -1,50 +1,42 @@
 from flask import Flask, render_template, request
 import csv
 import requests
-from io import StringIO
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'tu-clave-secreta'
+app.config['SECRET_KEY'] = 'clave-secreta'
 
-# 🔹 Lectura de datos desde Google Sheets como CSV
-def obtener_datos_desde_csv(gid):
-    base_url = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid="
-    url = base_url + gid
-    respuesta = requests.get(url)
-    contenido = respuesta.content.decode('utf-8')
-    lector = csv.reader(StringIO(contenido))
-    return list(lector)
+# Ruta base para archivos locales
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Función genérica para leer CSV
+def leer_csv(nombre_archivo):
+    ruta = os.path.join(BASE_DIR, nombre_archivo)
+    with open(ruta, encoding='utf-8') as f:
+        return list(csv.reader(f))[1:]
 
 def obtener_secciones():
-    datos = obtener_datos_desde_csv("1893025995")
-    return [fila[0] for fila in datos[1:] if fila]
+    return [fila[0] for fila in leer_csv('Secciones.csv') if fila]
 
 def obtener_alumnos():
-    datos = obtener_datos_desde_csv("70807267")
-    return [{"seccion": fila[0], "alumno": fila[1]} for fila in datos[1:] if len(fila) >= 2]
+    return [{"seccion": fila[0], "alumno": fila[1]} for fila in leer_csv('Alumnos.csv') if len(fila) >= 2]
 
 def obtener_acciones():
-    datos = obtener_datos_desde_csv("450918087")
-    return [fila[0] for fila in datos[1:] if fila]
+    return [fila[0] for fila in leer_csv('Acciones.csv') if fila]
 
 def obtener_dimensiones():
-    datos = obtener_datos_desde_csv("571366206")
-    return [fila[0] for fila in datos[1:] if fila]
+    return [fila[0] for fila in leer_csv('Dimensiones.csv') if fila]
 
 def obtener_motivos():
-    datos = obtener_datos_desde_csv("1668159635")
-    return [{"dimension": fila[0], "motivo": fila[1]} for fila in datos[1:] if len(fila) >= 2]
+    return [{"dimension": fila[0], "motivo": fila[1]} for fila in leer_csv('Motivos.csv') if len(fila) >= 2]
 
 def obtener_profesores():
-    datos = obtener_datos_desde_csv("2098899162")
-    return [fila[0] for fila in datos[1:] if fila]
+    return [fila[0] for fila in leer_csv('Profesores.csv') if fila]
 
-# 🔸 Pantalla de inicio
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
 
-# 🔸 Ruta del formulario
 @app.route('/formulario', methods=['GET', 'POST'])
 def formulario():
     secciones = obtener_secciones()
@@ -55,30 +47,29 @@ def formulario():
     profesores = obtener_profesores()
     mensaje = ""
 
-    # Depuración en consola para verificar que todo carga bien
-    print("✅ Secciones:", secciones[:3])
-    print("✅ Alumnos:", alumnos[:3])
-    print("✅ Acciones:", acciones[:3])
-    print("✅ Dimensiones:", dimensiones[:3])
-    print("✅ Motivos:", motivos[:3])
-    print("✅ Profesores:", profesores[:3])
-
     if request.method == 'POST':
         datos = {
-            "timestamp": request.form.get("timestamp"),
             "seccion": request.form.get("seccion"),
             "alumno": request.form.get("alumno"),
             "accion": request.form.get("accion"),
             "dimension": request.form.get("dimension"),
             "motivo": request.form.get("motivo"),
-            "fecha": request.form.get("fecha"),
             "observaciones": request.form.get("observaciones"),
             "consecutivo": request.form.get("consecutivo"),
-            "profesor": request.form.get("profesor"),
+            "profesor": request.form.get("profesor")
         }
 
-        print("✅ Alerta recibida:", datos)
-        mensaje = "✅ ¡Alerta enviada correctamente!"
+        try:
+            respuesta = requests.post(
+                'https://script.google.com/macros/s/AKfycbwG8YUEG0tZO1P_iP3pGtriHWu453wb_wfULGG0aYRRvq8oHovDfPBIuFdFqBN6VodhwQ/exec',
+                json=datos
+            )
+            if respuesta.status_code == 200 and "OK" in respuesta.text:
+                mensaje = "✅ ¡Alerta enviada correctamente!"
+            else:
+                mensaje = f"⚠️ Error inesperado: {respuesta.text}"
+        except Exception as e:
+            mensaje = f"❌ Fallo en la conexión: {str(e)}"
 
     return render_template(
         "index.html",
@@ -93,3 +84,7 @@ def formulario():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
