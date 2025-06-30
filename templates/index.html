@@ -5,18 +5,62 @@
   <meta http-equiv="cache-control" content="no-store" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Formulario de Alerta</title>
+
   <style>
     body {
       max-width: 700px;
       margin: auto;
-      padding: 20px;
       font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
     }
+
+    header {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: normal;
+      margin: 0;
+    }
+
+    nav {
+      background-color: #28a745;
+      padding: 10px 0;
+      text-align: center;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: white;
+      font-size: 15px;
+      font-weight: normal;
+    }
+
+    nav a:hover {
+      color: #e6ffe6;
+    }
+
+    main {
+      padding: 20px;
+    }
+
     label {
       margin-top: 12px;
       display: block;
       font-weight: bold;
     }
+
     select, input, textarea {
       width: 100%;
       padding: 6px;
@@ -24,6 +68,7 @@
       margin-bottom: 14px;
       box-sizing: border-box;
     }
+
     button {
       padding: 10px 16px;
       background-color: #28a745;
@@ -32,9 +77,11 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #218838;
     }
+
     #mensaje {
       color: green;
       font-weight: bold;
@@ -43,69 +90,80 @@
   </style>
 </head>
 <body>
-  <h1>Formulario de Alerta</h1>
 
-  {% if mensaje %}
-    <p id="mensaje">{{ mensaje }}</p>
-    <script>
-      setTimeout(() => document.getElementById("mensaje").style.display = "none", 5000);
-    </script>
-  {% endif %}
+  <header>
+    <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo">
+    <h1>Formulario de Alertas</h1>
+  </header>
 
-  <form method="post">
-    <input type="hidden" id="id_alerta" name="id_alerta" />
+  <nav>
+    <a href="{{ url_for('inicio') }}">🏠 Inicio</a>
+    <a href="{{ url_for('formulario') }}">📄 Alertas</a>
+  </nav>
 
-    <label for="seccion">Sección:</label>
-    <select id="seccion" name="seccion" required>
-      <option value="">Seleccione una sección</option>
-      {% for seccion in secciones %}
-        <option value="{{ seccion }}">{{ seccion }}</option>
-      {% endfor %}
-    </select>
+  <main>
+    {% if mensaje %}
+      <p id="mensaje">{{ mensaje }}</p>
+      <script>
+        setTimeout(() => document.getElementById("mensaje").style.display = "none", 5000);
+      </script>
+    {% endif %}
 
-    <label for="alumno">Nombre Alumno:</label>
-    <select id="alumno" name="alumno" required>
-      <option value="">Seleccione un alumno</option>
-    </select>
+    <form method="post">
+      <input type="hidden" id="id_alerta" name="id_alerta" />
 
-    <label for="accion">Acción Ejecutada:</label>
-    <select id="accion" name="accion" required>
-      <option value="">Seleccione una acción</option>
-      {% for accion in acciones %}
-        <option value="{{ accion }}">{{ accion }}</option>
-      {% endfor %}
-    </select>
+      <label for="seccion">Sección:</label>
+      <select id="seccion" name="seccion" required>
+        <option value="">Seleccione una sección</option>
+        {% for seccion in secciones %}
+          <option value="{{ seccion }}">{{ seccion }}</option>
+        {% endfor %}
+      </select>
 
-    <label for="dimension">Dimensión:</label>
-    <select id="dimension" name="dimension" required>
-      <option value="">Seleccione una dimensión</option>
-      {% for dimension in dimensiones %}
-        <option value="{{ dimension }}">{{ dimension }}</option>
-      {% endfor %}
-    </select>
+      <label for="alumno">Nombre Alumno:</label>
+      <select id="alumno" name="alumno" required>
+        <option value="">Seleccione un alumno</option>
+      </select>
 
-    <label for="motivo">Motivo Alerta:</label>
-    <select id="motivo" name="motivo" required>
-      <option value="">Seleccione un motivo</option>
-    </select>
+      <label for="accion">Acción Ejecutada:</label>
+      <select id="accion" name="accion" required>
+        <option value="">Seleccione una acción</option>
+        {% for accion in acciones %}
+          <option value="{{ accion }}">{{ accion }}</option>
+        {% endfor %}
+      </select>
 
-    <label for="observaciones">Observaciones:</label>
-    <textarea id="observaciones" name="observaciones" rows="4" cols="40"></textarea>
+      <label for="dimension">Dimensión:</label>
+      <select id="dimension" name="dimension" required>
+        <option value="">Seleccione una dimensión</option>
+        {% for dimension in dimensiones %}
+          <option value="{{ dimension }}">{{ dimension }}</option>
+        {% endfor %}
+      </select>
 
-    <label for="consecutivo">Nº Consecutivo:</label>
-    <input type="number" id="consecutivo" name="consecutivo" required>
+      <label for="motivo">Motivo Alerta:</label>
+      <select id="motivo" name="motivo" required>
+        <option value="">Seleccione un motivo</option>
+      </select>
 
-    <label for="profesor">Nombre Profesor:</label>
-    <select id="profesor" name="profesor" required>
-      <option value="">Seleccione un profesor</option>
-      {% for profesor in profesores %}
-        <option value="{{ profesor }}">{{ profesor }}</option>
-      {% endfor %}
-    </select>
+      <label for="observaciones">Observaciones:</label>
+      <textarea id="observaciones" name="observaciones" rows="4" cols="40"></textarea>
 
-    <input type="hidden" id="timestamp" name="timestamp" />
-    <button type="submit">Enviar alerta</button>
-  </form>
+      <label for="consecutivo">Nº Consecutivo:</label>
+      <input type="number" id="consecutivo" name="consecutivo" required>
+
+      <label for="profesor">Nombre Profesor:</label>
+      <select id="profesor" name="profesor" required>
+        <option value="">Seleccione un profesor</option>
+        {% for profesor in profesores %}
+          <option value="{{ profesor }}">{{ profesor }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="hidden" id="timestamp" name="timestamp" />
+      <button type="submit">Enviar alerta</button>
+    </form>
+  </main>
 
   <script>
     const alumnos = {{ alumnos | tojson }};
@@ -144,5 +202,6 @@
       document.getElementById('timestamp').value = new Date().toISOString();
     });
   </script>
+
 </body>
 </html>

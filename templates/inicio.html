@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Alertas</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+
+    header {
+      background-color: #28a745;
+      color: white;
+      padding: 20px 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .logo {
+      margin: 60px auto 80px;
+    }
+
+    .logo img {
+      max-width: 250px;
+      height: auto;
+    }
+
+    nav {
+      background-color: #28a745;
+      padding: 20px 0;
+    }
+
+    nav a {
+      margin: 0 25px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    nav a:hover {
+      color: #e6ffe6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Sistema de Alertas Tempranas
+  </header>
+
+  <div class="logo">
+    <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo del Colegio">
+  </div>
+
+  <nav>
+    <a href="{{ url_for('inicio') }}">🏠 Inicio</a>
+    <a href="{{ url_for('formulario') }}">📄 Alertas</a>
+  </nav>
+
+</body>
+</html>

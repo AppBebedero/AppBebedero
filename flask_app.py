@@ -39,9 +39,14 @@ def obtener_profesores():
     datos = obtener_datos_desde_csv("2098899162")
     return [fila[0] for fila in datos[1:] if fila]
 
-# 🔸 Ruta principal
-@app.route('/', methods=['GET', 'POST'])
-def home():
+# 🔸 Pantalla de inicio
+@app.route('/')
+def inicio():
+    return render_template('inicio.html')
+
+# 🔸 Ruta del formulario
+@app.route('/formulario', methods=['GET', 'POST'])
+def formulario():
     secciones = obtener_secciones()
     alumnos = obtener_alumnos()
     acciones = obtener_acciones()
