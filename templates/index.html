@@ -2,206 +2,268 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="cache-control" content="no-store" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario de Alerta</title>
+  <title>Formulario de Alertas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      max-width: 700px;
-      margin: auto;
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      background-color: #f9f9f9;
+      padding-bottom: 60px;
     }
 
     header {
       background-color: #28a745;
       color: white;
-      padding: 10px 20px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
-    }
-
-    header img {
-      height: 40px;
-      margin-right: 15px;
-    }
-
-    header h1 {
-      font-size: 22px;
-      font-weight: normal;
-      margin: 0;
-    }
-
-    nav {
-      background-color: #28a745;
-      padding: 10px 0;
-      text-align: center;
-    }
-
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: white;
-      font-size: 15px;
-      font-weight: normal;
-    }
-
-    nav a:hover {
-      color: #e6ffe6;
-    }
-
-    main {
-      padding: 20px;
-    }
-
-    label {
-      margin-top: 12px;
-      display: block;
-      font-weight: bold;
-    }
-
-    select, input, textarea {
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
       width: 100%;
-      padding: 6px;
-      margin-top: 4px;
-      margin-bottom: 14px;
-      box-sizing: border-box;
+      z-index: 1000;
     }
 
-    button {
-      padding: 10px 16px;
-      background-color: #28a745;
-      color: white;
-      border: none;
+    .logo-header {
+      height: 40px;
+    }
+
+    .titulo {
+      font-size: 18px;
       font-weight: bold;
+      flex-grow: 1;
+      text-align: center;
+      margin-left: 10px;
+      margin-right: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-icon {
+      font-size: 22px;
+      cursor: pointer;
+      color: white;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: white;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      transition: left 0.3s;
+      z-index: 1001;
+    }
+
+    #sidebar .close-btn {
+      font-size: 22px;
+      text-align: right;
+      padding: 15px;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #218838;
+    #sidebar a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: #333;
+      border-bottom: 1px solid #ccc;
     }
 
-    #mensaje {
-      color: green;
+    #sidebar a:hover {
+      background-color: #f0f0f0;
+    }
+
+    main {
+      padding: 90px 20px 20px; /* Espacio para el header fijo */
+      max-width: 600px;
+      margin: auto;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 5px;
+    }
+
+    select, textarea, input {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px;
+      border: none;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .mensaje {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #28a745;
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      z-index: 999;
+    }
+
+    nav.bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      text-decoration: none;
+      font-size: 10px;
+    }
+
+    nav.bottom-nav a i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    @media (min-width: 600px) {
+      .titulo { font-size: 22px; }
+      nav.bottom-nav a { font-size: 12px; }
+      nav.bottom-nav a i { font-size: 22px; }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo">
-    <h1>Formulario de Alertas</h1>
+    <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo" class="logo-header">
+    <div class="titulo">Formulario de Alertas</div>
+    <i id="menu-toggle" class="fas fa-bars menu-icon"></i>
   </header>
 
-  <nav>
-    <a href="{{ url_for('inicio') }}">🏠 Inicio</a>
-    <a href="{{ url_for('formulario') }}">📄 Alertas</a>
-  </nav>
+  <div id="sidebar">
+    <div class="close-btn" onclick="cerrarSidebar()">✖</div>
+    <a href="#">📁 Opción 1</a>
+    <a href="#">📂 Opción 2</a>
+    <a href="#">🔧 Ajustes</a>
+    <a href="#">📤 Salir</a>
+  </div>
 
   <main>
-    {% if mensaje %}
-      <p id="mensaje">{{ mensaje }}</p>
-      <script>
-        setTimeout(() => document.getElementById("mensaje").style.display = "none", 5000);
-      </script>
-    {% endif %}
-
-    <form method="post">
-      <input type="hidden" id="id_alerta" name="id_alerta" />
-
-      <label for="seccion">Sección:</label>
-      <select id="seccion" name="seccion" required>
-        <option value="">Seleccione una sección</option>
+    <form method="POST">
+      <label for="seccion">Sección</label>
+      <select name="seccion" required>
+        <option value="" disabled selected>Seleccione una sección</option>
         {% for seccion in secciones %}
           <option value="{{ seccion }}">{{ seccion }}</option>
         {% endfor %}
       </select>
 
-      <label for="alumno">Nombre Alumno:</label>
-      <select id="alumno" name="alumno" required>
-        <option value="">Seleccione un alumno</option>
+      <label for="alumno">Alumno</label>
+      <select name="alumno" required>
+        <option value="" disabled selected>Seleccione un alumno</option>
+        {% for item in alumnos %}
+          <option value="{{ item.alumno }}">{{ item.alumno }}</option>
+        {% endfor %}
       </select>
 
-      <label for="accion">Acción Ejecutada:</label>
-      <select id="accion" name="accion" required>
-        <option value="">Seleccione una acción</option>
+      <label for="accion">Acción</label>
+      <select name="accion" required>
+        <option value="" disabled selected>Seleccione una acción</option>
         {% for accion in acciones %}
           <option value="{{ accion }}">{{ accion }}</option>
         {% endfor %}
       </select>
 
-      <label for="dimension">Dimensión:</label>
-      <select id="dimension" name="dimension" required>
-        <option value="">Seleccione una dimensión</option>
+      <label for="dimension">Dimensión</label>
+      <select name="dimension" required>
+        <option value="" disabled selected>Seleccione una dimensión</option>
         {% for dimension in dimensiones %}
           <option value="{{ dimension }}">{{ dimension }}</option>
         {% endfor %}
       </select>
 
-      <label for="motivo">Motivo Alerta:</label>
-      <select id="motivo" name="motivo" required>
-        <option value="">Seleccione un motivo</option>
+      <label for="motivo">Motivo</label>
+      <select name="motivo" required>
+        <option value="" disabled selected>Seleccione un motivo</option>
+        {% for item in motivos %}
+          <option value="{{ item.motivo }}">{{ item.motivo }}</option>
+        {% endfor %}
       </select>
 
-      <label for="observaciones">Observaciones:</label>
-      <textarea id="observaciones" name="observaciones" rows="4" cols="40"></textarea>
+      <label for="observaciones">Observaciones</label>
+      <textarea name="observaciones" rows="3" required></textarea>
 
-      <label for="consecutivo">Nº Consecutivo:</label>
-      <input type="number" id="consecutivo" name="consecutivo" required>
+      <label for="consecutivo">Consecutivo</label>
+      <input type="text" name="consecutivo" required />
 
-      <label for="profesor">Nombre Profesor:</label>
-      <select id="profesor" name="profesor" required>
-        <option value="">Seleccione un profesor</option>
+      <label for="profesor">Profesor</label>
+      <select name="profesor" required>
+        <option value="" disabled selected>Seleccione un profesor</option>
         {% for profesor in profesores %}
           <option value="{{ profesor }}">{{ profesor }}</option>
         {% endfor %}
       </select>
 
-      <input type="hidden" id="timestamp" name="timestamp" />
-      <button type="submit">Enviar alerta</button>
+      <button type="submit">Enviar Alerta</button>
     </form>
+
+    {% if mensaje %}
+      <p class="mensaje">{{ mensaje }}</p>
+    {% endif %}
   </main>
 
+  <nav class="bottom-nav">
+    <a href="{{ url_for('inicio') }}">
+      <i class="fas fa-home"></i>
+      Inicio
+    </a>
+    <a href="{{ url_for('formulario') }}">
+      <i class="fas fa-bell"></i>
+      Alertas
+    </a>
+    <a href="#">
+      <i class="fas fa-chart-bar"></i>
+      Reportes
+    </a>
+  </nav>
+
   <script>
-    const alumnos = {{ alumnos | tojson }};
-    const seccionField = document.getElementById('seccion');
-    const alumnoField = document.getElementById('alumno');
+    const toggleSidebar = () => {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
+    };
 
-    seccionField.addEventListener('change', function () {
-      const seleccion = this.value;
-      alumnoField.innerHTML = '<option value="">Seleccione un alumno</option>';
-      const filtrados = alumnos.filter(a => a.seccion === seleccion);
-      filtrados.forEach(a => {
-        const opcion = document.createElement('option');
-        opcion.value = a.alumno;
-        opcion.textContent = a.alumno;
-        alumnoField.appendChild(opcion);
-      });
-    });
+    const cerrarSidebar = () => {
+      document.getElementById('sidebar').style.left = '-250px';
+    };
 
-    const motivos = {{ motivos | tojson }};
-    const dimensionField = document.getElementById('dimension');
-    const motivoField = document.getElementById('motivo');
-
-    dimensionField.addEventListener('change', function () {
-      const seleccion = this.value;
-      motivoField.innerHTML = '<option value="">Seleccione un motivo</option>';
-      const filtrados = motivos.filter(m => m.dimension === seleccion);
-      filtrados.forEach(m => {
-        const opcion = document.createElement('option');
-        opcion.value = m.motivo;
-        opcion.textContent = m.motivo;
-        motivoField.appendChild(opcion);
-      });
-    });
-
-    document.querySelector('form').addEventListener('submit', function () {
-      document.getElementById('timestamp').value = new Date().toISOString();
-    });
+    document.getElementById('menu-toggle').addEventListener('click', toggleSidebar);
   </script>
-
 </body>
 </html>
