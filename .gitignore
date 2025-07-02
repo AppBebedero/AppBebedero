@@ -1,0 +1,13 @@
+# Archivos de Python
+__pycache__/
+*.pyc
+
+# Archivos de entorno y configuraciones locales
+*.env
+clave.txt
+
+# Archivos CSV si no deseas respaldarlos en GitHub
+*.csv
+
+# Carpetas comunes
+static/
