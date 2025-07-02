@@ -1,7 +1,7 @@
 
 # 📢 Sistema de Alertas – Liceo de Bebedero
 
-Este es un sistema web desarrollado por **José Daniel Quesada M.** en **Flask (Python)** para el registro y seguimiento de **alertas tempranas** en el Liceo de Bebedero, Cañas.
+Este es un sistema web desarrollado por **José Daniel Quesada M.** en **Flask (Python)** para el registro y seguimiento de **alertas tempranas** en el Liceo de Bebedero, Cañas, Guanacaste.
 
 El sistema permite:
 - Enviar alertas a la Oficina de Orientación y a la Dirección del Liceo
