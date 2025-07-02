@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Sistema de Alertas{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: #2e7d32;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      z-index: 1000;
+    }
+
+    header img {
+      height: 40px;
+      margin-left: 10px;
+    }
+
+    header h1 {
+      font-size: 16px;
+      flex-grow: 1;
+      text-align: center;
+      margin: 0;
+    }
+
+    .menu-icon {
+      font-size: 24px;
+      margin-right: 16px;
+      cursor: pointer;
+      color: white;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100%;
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transition: left 0.3s ease-in-out;
+      padding: 20px;
+    }
+
+    #sidebar.active {
+      left: 0;
+    }
+
+    #sidebar .close-btn {
+      font-size: 24px;
+      cursor: pointer;
+      text-align: right;
+      color: #333;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    #sidebar ul li {
+      padding: 10px 0;
+      border-bottom: 1px solid #ccc;
+    }
+
+    #sidebar ul li a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    main {
+      padding: 80px 20px 100px 20px;
+    }
+
+    .logo-central {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 60px auto 10px;
+    }
+
+    .logo-central img {
+      max-width: 50%;
+      height: auto;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #2e7d32;
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    nav i {
+      font-size: 20px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra superior -->
+  <header>
+    <img src="{{ url_for('static', filename='LogoTrans.png') }}" alt="Logo">
+    <h1>{% block topbar_title %}Sistema de Alertas Tempranas{% endblock %}</h1>
+    <i class="bi bi-list menu-icon" onclick="toggleSidebar()"></i>
+  </header>
+
+  <!-- Menú lateral -->
+  <aside id="sidebar">
+    <div class="close-btn" onclick="toggleSidebar()">&times;</div>
+    <ul>
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/formulario">Alertas</a></li>
+      <li><a href="#" onclick="pedirClave()">Reportes</a></li>
+      <li><a href="#">Acerca de</a></li>
+      <li><a href="#">Desarrollador</a></li>
+    </ul>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Logo solo en inicio -->
+  {% if request.path == "/" %}
+  <div class="logo-central">
+    <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo del Colegio">
+  </div>
+  {% endif %}
+
+  <!-- Barra inferior -->
+  <nav>
+    <a href="/"><i class="bi bi-house-door-fill"></i>Inicio</a>
+    <a href="/formulario"><i class="bi bi-pencil-square"></i>Alertas</a>
+    <a href="#" onclick="pedirClave()"><i class="bi bi-bar-chart-fill"></i>Reportes</a>
+  </nav>
+
+  <!-- Script JS -->
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("active");
+    }
+
+    function pedirClave() {
+      const clave = prompt("🔒 Ingrese la clave para acceder a Reportes:");
+      if (clave === null || clave.trim() === "") return;
+
+      fetch("/verificar_clave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clave: clave })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.resultado === "ok") {
+          window.location.href = "/reportes";
+        } else {
+          alert(data.mensaje || "Acceso denegado.");
+        }
+      })
+      .catch(err => {
+        alert("Ocurrió un error al verificar la clave.");
+      });
+    }
+  </script>
+</body>
+</html>
