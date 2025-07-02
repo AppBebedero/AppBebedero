@@ -1,0 +1,1 @@
+web: gunicorn mysite.flask_app:app
