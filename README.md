@@ -99,4 +99,6 @@ Celular: 8788-9993
 Proyecto de uso educativo y privado.  
 Todos los derechos reservados.  
 Liceo de Bebedero – 2025.
+Última actualización: julio 2025.
+
 
