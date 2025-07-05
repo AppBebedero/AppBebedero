@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Acerca de esta App{% endblock %}
+
+{% block topbar_title %}Acerca de esta App{% endblock %}
+
+{% block content %}
+<style>
+  .markdown-body {
+    max-width: 100%;
+    width: 90%;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 10px;
+    text-align: justify;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    font-weight: bold;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .markdown-body h1 { font-size: 22px; }
+  .markdown-body h2 { font-size: 18px; }
+  .markdown-body h3 { font-size: 16px; }
+
+  .markdown-body ul,
+  .markdown-body ol {
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+  }
+
+  .markdown-body pre,
+  .markdown-body code {
+    background-color: #f4f4f4;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .markdown-body a {
+    color: #2e7d32;
+    word-break: break-word;
+  }
+
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+
+  .markdown-body table,
+  .markdown-body th,
+  .markdown-body td {
+    border: 1px solid #ccc;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .icon-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Margen superior para evitar que quede muy pegado a la barra */
+  .markdown-body:first-child {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="markdown-body">
+  {{ contenido
+    | replace("**Correo**", "<span class='icon-label'>📧</span>")
+    | replace("**Celular**", "<span class='icon-label'>📱</span>")
+    | safe }}
+</div>
+{% endblock %}
+

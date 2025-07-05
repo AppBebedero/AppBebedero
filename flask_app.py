@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 import csv
 import requests
 import os
@@ -6,11 +6,22 @@ import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
+import markdown
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave-secreta'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# --- Configuración para subir imágenes ---
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def leer_csv(nombre_archivo):
     ruta = os.path.join(BASE_DIR, nombre_archivo)
@@ -20,8 +31,14 @@ def leer_csv(nombre_archivo):
 def obtener_secciones():
     return [fila[0] for fila in leer_csv('Secciones.csv') if fila]
 
-def obtener_alumnos():
-    return [{"seccion": fila[0], "alumno": fila[1]} for fila in leer_csv('Alumnos.csv') if len(fila) >= 2]
+def obtener_alumnos(seccion_seleccionada=None):
+    alumnos = [
+        {"seccion": fila[0], "alumno": fila[1]}
+        for fila in leer_csv('Alumnos.csv') if len(fila) >= 2
+    ]
+    if seccion_seleccionada:
+        alumnos = [a for a in alumnos if a["seccion"] == seccion_seleccionada]
+    return sorted(alumnos, key=lambda x: x['alumno'])
 
 def obtener_acciones():
     return [fila[0] for fila in leer_csv('Acciones.csv') if fila]
@@ -38,7 +55,7 @@ def obtener_profesores():
 def enviar_alerta_por_correo(info):
     try:
         remitente = 'alertas.bebedero@gmail.com'
-        contraseña = 'xcvajtntwvgixkb'
+        contrasena = 'xcvajtntwvgixkb'
         destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'josedanny09@gmail.com']
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
 
@@ -58,9 +75,8 @@ def enviar_alerta_por_correo(info):
         msg['To'] = ', '.join(destinatarios)
 
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as servidor:
-            servidor.login(remitente, contraseña)
+            servidor.login(remitente, contrasena)
             servidor.send_message(msg)
-
     except Exception as e:
         print("❌ Error al enviar correo:", e)
 
@@ -79,6 +95,16 @@ def formulario():
     mensaje = ""
 
     if request.method == 'POST':
+        archivo = request.files.get('imagen')
+        nombre_imagen = ""
+        consecutivo = request.form.get("consecutivo", "0000").strip()
+
+        if archivo and allowed_file(archivo.filename):
+            extension = archivo.filename.rsplit('.', 1)[1].lower()
+            nombre_imagen = f"foto_{consecutivo}.{extension}"
+            ruta_imagen = os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen)
+            archivo.save(ruta_imagen)
+
         datos = {
             "seccion": request.form.get("seccion"),
             "alumno": request.form.get("alumno"),
@@ -86,14 +112,15 @@ def formulario():
             "dimension": request.form.get("dimension"),
             "motivo": request.form.get("motivo"),
             "observaciones": request.form.get("observaciones"),
-            "consecutivo": request.form.get("consecutivo"),
+            "consecutivo": consecutivo,
             "profesor": request.form.get("profesor"),
-            "timestamp": request.form.get("timestamp")
+            "timestamp": request.form.get("timestamp"),
+            "Foto_Consecutivo": nombre_imagen
         }
 
         try:
             respuesta = requests.post(
-                'https://script.google.com/macros/s/AKfycbwG8YUEG0tZO1P_iP3pGtriHWu453wb_wfULGG0aYRRvq8oHovDfPBIuFdFqBN6VodhwQ/exec',
+                'https://script.google.com/macros/s/AKfycbyAvfjNACEkE7-2ASzqbVmMjqPJbVMwu2PjloGcfV6iYHkNclDAbuxETX8eo_U3DzAPLw/exec',
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -116,24 +143,32 @@ def formulario():
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
-    GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid=476352620"
+    URL_CSV = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid=476352620"
+    seccion_actual = request.form.get("seccion", "").strip()
+    estudiante_actual = request.form.get("estudiante", "").strip()
+    desde_raw = request.form.get('desde', '').strip()
+    hasta_raw = request.form.get('hasta', '').strip()
 
     try:
-        df = pd.read_csv(GOOGLE_SHEET_CSV_URL)
-
+        df = pd.read_csv(URL_CSV)
         df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
 
-        desde_raw = request.form.get('desde', '').strip()
-        hasta_raw = request.form.get('hasta', '').strip()
-
-        if desde_raw and hasta_raw:
+        if desde_raw:
             desde = pd.to_datetime(desde_raw, format='%Y-%m-%d', errors='coerce').date()
+            df = df[df['Timestamp'].dt.date >= desde]
+
+        if hasta_raw:
             hasta = pd.to_datetime(hasta_raw, format='%Y-%m-%d', errors='coerce').date()
-            df = df[df['Timestamp'].dt.date.between(desde, hasta)]
+            df = df[df['Timestamp'].dt.date <= hasta]
+
+        if seccion_actual:
+            df = df[df['Sección'] == seccion_actual]
+
+        if estudiante_actual:
+            df = df[df['Nombre_Alumno'] == estudiante_actual]
 
         df = df.sort_values(by='Timestamp', ascending=False)
         registros = df.to_dict(orient='records')
-
     except Exception as e:
         registros = []
         print(f"❌ Error al cargar datos de reportes: {e}")
@@ -141,14 +176,17 @@ def reportes():
     return render_template(
         'reportes.html',
         registros=registros,
-        desde=request.form.get('desde', ''),
-        hasta=request.form.get('hasta', '')
+        desde=desde_raw,
+        hasta=hasta_raw,
+        seccion_actual=seccion_actual,
+        estudiante_actual=estudiante_actual,
+        secciones=obtener_secciones(),
+        alumnos=obtener_alumnos(seccion_actual)
     )
 
 @app.route('/verificar_clave', methods=['POST'])
 def verificar_clave():
     clave_ingresada = request.json.get('clave', '')
-
     try:
         with open(os.path.join(BASE_DIR, 'clave.txt'), 'r', encoding='utf-8') as f:
             clave_correcta = f.read().strip()
@@ -169,7 +207,6 @@ def verificar_clave():
         except Exception:
             ubicacion = "Desconocida"
             org = "Desconocido"
-
         info = {
             'ip': ip,
             'ubicacion': ubicacion,
@@ -177,13 +214,25 @@ def verificar_clave():
             'user_agent': request.headers.get('User-Agent', 'Desconocido'),
             'hora': datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         }
-
         enviar_alerta_por_correo(info)
-
         return jsonify({
             'resultado': 'error',
             'mensaje': '🔒 Su clave es incorrecta o usted no está autorizado a ingresar a Reportes'
         })
+
+@app.route('/manual')
+def manual():
+    return render_template('manual.html')
+
+@app.route('/acerca')
+def acerca():
+    try:
+        with open(os.path.join(BASE_DIR, 'README.md'), 'r', encoding='utf-8') as f:
+            contenido_md = f.read()
+        contenido_html = markdown.markdown(contenido_md)
+    except Exception:
+        contenido_html = "<p>Error al cargar el contenido.</p>"
+    return render_template('acerca.html', contenido=contenido_html)
 
 if __name__ == '__main__':
     app.run(debug=True)

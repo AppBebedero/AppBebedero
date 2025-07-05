@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Acerca de esta App{% endblock %}
+{% block topbar_title %}Acerca de esta App{% endblock %}
+
+{% block content %}
+<style>
+  .readme-container {
+    max-width: 66%;
+    margin: 0 auto;
+    padding: 10px 10px 30px 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  .readme-container h1,
+  .readme-container h2,
+  .readme-container h3 {
+    font-weight: bold;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .readme-container ul {
+    padding-left: 20px;
+  }
+
+  .readme-container pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f3f3f3;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+  }
+
+  .readme-container a {
+    word-break: break-word;
+  }
+
+  .contact-icon {
+    margin-right: 6px;
+  }
+</style>
+
+<div class="readme-container">
+  {{ contenido|safe }}
+</div>
+{% endblock %}
+

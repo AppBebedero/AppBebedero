@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Formulario de Alerta{% endblock %}
+
 {% block topbar_title %}Formulario de Alerta{% endblock %}
 
 {% block content %}
@@ -82,23 +83,9 @@
     margin-bottom: 20px;
     text-align: center;
   }
-
-  #preview-container {
-    text-align: center;
-    margin-bottom: 16px;
-  }
-
-  #preview {
-    display: none;
-    max-width: 100%;
-    max-height: 200px;
-    border: 2px dashed #ccc;
-    padding: 4px;
-    border-radius: 6px;
-  }
 </style>
 
-<form method="post" enctype="multipart/form-data">
+<form method="post">
   {% if mensaje %}
     <p id="mensaje">{{ mensaje }}</p>
     <script>
@@ -157,12 +144,6 @@
     {% endfor %}
   </select>
 
-  <label for="imagen">📸 Foto del documento (opcional):</label>
-  <div id="preview-container">
-    <img id="preview" src="#" alt="Vista previa de la imagen">
-  </div>
-  <input type="file" id="imagen" name="imagen" accept="image/*" capture="environment">
-
   <input type="hidden" id="timestamp" name="timestamp" />
 
   <div class="botones">
@@ -176,6 +157,7 @@
 </form>
 
 <script>
+  // Alumnos: filtrar según sección
   const alumnos = {{ alumnos | tojson }};
   const campoSeccion = document.getElementById('seccion');
   const campoAlumno = document.getElementById('alumno');
@@ -192,6 +174,7 @@
     });
   });
 
+  // Motivos: filtrar según dimensión
   const motivos = {{ motivos | tojson }};
   const campoDimension = document.getElementById('dimension');
   const campoMotivo = document.getElementById('motivo');
@@ -208,18 +191,9 @@
     });
   });
 
+  // Timestamp automático al enviar
   document.querySelector('form').addEventListener('submit', function () {
     document.getElementById('timestamp').value = new Date().toISOString();
-  });
-
-  // Mostrar vista previa de imagen
-  document.getElementById("imagen").addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (file) {
-      const preview = document.getElementById("preview");
-      preview.src = URL.createObjectURL(file);
-      preview.style.display = "block";
-    }
   });
 </script>
 {% endblock %}

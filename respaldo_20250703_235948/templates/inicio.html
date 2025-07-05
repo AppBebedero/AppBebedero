@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  body {
+    background-color: white !important;
+  }
+
+  .contenido-inicio {
+    background-color: white;
+    min-height: calc(100vh - 160px); /* Altura restante entre top y bottom bar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 10px 10px 10px; /* Subido el logo un poco más */
+  }
+
+  .contenido-inicio img {
+    max-width: 300px;
+    width: 80%;
+    height: auto;
+  }
+</style>
+
+<div class="contenido-inicio">
+  <img src="{{ url_for('static', filename='Bebedero2.png') }}" alt="Logo Colegio" />
+</div>
+{% endblock %}

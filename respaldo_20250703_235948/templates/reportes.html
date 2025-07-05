@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+<h5 class="mb-0 text-white">Reporte General de Alertas</h5>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <!-- Formulario de Filtro -->
+  <form method="POST" class="row g-3 justify-content-center mb-4">
+    <div class="col-md-4">
+      <label for="desde" class="form-label">Desde</label>
+      <input type="date" id="desde" name="desde" value="{{ desde if request.method == 'POST' else '' }}" class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label for="hasta" class="form-label">Hasta</label>
+      <input type="date" id="hasta" name="hasta" value="{{ hasta if request.method == 'POST' else '' }}" class="form-control">
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-success w-100">
+        <i class="bi bi-funnel-fill"></i> Filtrar
+      </button>
+    </div>
+  </form>
+
+  {% if request.method == 'POST' %}
+    {% if registros %}
+      <div class="row">
+        {% for fila in registros %}
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3 shadow-sm">
+              {% for clave, valor in fila.items() %}
+                <p style="margin-bottom: 4px;">
+                  <strong>{{ 'Fecha/Hora' if clave == 'Timestamp' else clave }}:</strong> {{ valor }}
+                </p>
+              {% endfor %}
+              <hr style="border: none; border-top: 3px solid #2e7d32; margin: 10px 0;">
+              <div style="text-align: center; font-size: 20px; color: #2e7d32;">📌</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-warning text-center" role="alert">
+        No hay datos para mostrar en el rango seleccionado.
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

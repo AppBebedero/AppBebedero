@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Manual de Uso{% endblock %}
+{% block topbar_title %}Manual de Uso{% endblock %}
+
+{% block content %}
+<style>
+  .manual-contenido {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: justify;
+    padding: 20px;
+  }
+
+  .manual-contenido h2 {
+    font-size: 22px;
+    color: #2e7d32;
+    margin-top: 30px;
+  }
+
+  .manual-contenido ul,
+  .manual-contenido ol {
+    padding-left: 20px;
+  }
+
+  .manual-contenido li {
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="manual-contenido">
+  <h2>✅ ¿Qué es este Sistema?</h2>
+  <p>El Sistema de Alertas Tempranas permite a docentes y personal educativo registrar situaciones relevantes del estudiantado que puedan requerir atención por parte del Departamento de Orientación y Equipo para la permanencia institucional. Está diseñado para ser simple, rápido y accesible desde cualquier dispositivo.</p>
+
+  <h2>👤 ¿Quiénes pueden usarlo?</h2>
+  <p>El sistema está disponible para:</p>
+  <ul>
+    <li>Docentes del Liceo de Bebedero</li>
+    <li>Personal administrativo autorizado</li>
+  </ul>
+  <p>Cada registro se guarda de forma segura en una base de datos administrada por el equipo de Orientación.</p>
+
+  <h2>📝 ¿Cómo registrar una alerta?</h2>
+  <ol>
+    <li>Ingrese a la sección <strong>"Alertas"</strong> desde el menú inferior o lateral.</li>
+    <li>Seleccione la <strong>sección</strong> y el <strong>nombre del estudiante</strong>.</li>
+    <li>Indique la <strong>acción observada</strong> y la <strong>dimensión</strong> correspondiente.</li>
+    <li>Seleccione un <strong>motivo</strong> o justificación.</li>
+    <li>Agregue una <strong>observación adicional</strong> (opcional).</li>
+    <li>Ingrese su nombre en el campo <strong>"Profesor que reporta"</strong>.</li>
+    <li>Presione <strong>Enviar</strong> para registrar la alerta.</li>
+  </ol>
+  <p>Recibirá un mensaje de confirmación si todo fue exitoso.</p>
+
+  <h2>🔍 ¿Cómo ver los reportes?</h2>
+  <ol>
+    <li>Presione el botón <strong>"Reportes"</strong> en el menú inferior o lateral.</li>
+    <li>Ingrese la <strong>clave de acceso autorizada</strong>.</li>
+    <li>Una vez validada, podrá ver todos los registros ordenados por fecha.</li>
+    <li>Puede aplicar filtros por:</li>
+    <ul>
+      <li><strong>Fechas</strong>: Seleccione una fecha de inicio y fin para ver solo los registros dentro de ese rango.</li>
+      <li><strong>Sección</strong>: Use el botón <strong>“➕ Filtros Avanzados”</strong> para seleccionar una sección específica.</li>
+      <li><strong>Estudiante</strong>: También desde los filtros avanzados, puede seleccionar a un estudiante específico.</li>
+      <li><strong>Combinaciones</strong>: Puede usar uno o varios filtros al mismo tiempo (ejemplo: sección + estudiante + fecha).</li>
+    </ul>
+    <li>Presione el botón <strong>Filtrar</strong> para aplicar los criterios.</li>
+  </ol>
+
+  <h2>ℹ️ Recomendaciones</h2>
+  <ul>
+    <li>Use el sistema de forma responsable y ética.</li>
+    <li>No comparta la clave de acceso a Reportes.</li>
+    <li>Evite registros repetidos o incompletos.</li>
+    <li>Si nota errores o necesita ajustes, contacte al desarrollador.</li>
+  </ul>
+
+  <h2>📞 Soporte Técnico</h2>
+  <ul>
+    <li>📧 <strong>Correo:</strong> jdaniel.quesadam@gmail.com</li>
+    <li>📱 <strong>Teléfono:</strong> +506 8788-9993</li>
+  </ul>
+</div>
+{% endblock %}

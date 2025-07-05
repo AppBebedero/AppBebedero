@@ -6,18 +6,126 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
-  <!-- Formulario de Filtro -->
-  <form method="POST" class="row g-3 justify-content-center mb-4">
-    <div class="col-md-4">
-      <label for="desde" class="form-label">Desde</label>
-      <input type="date" id="desde" name="desde" value="{{ desde if request.method == 'POST' else '' }}" class="form-control">
+
+  <p style="color: red; font-weight: bold;">🧪Seleccione el filtro deseado</p>
+
+  <style>
+    .formulario-filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .campo {
+      flex: 1 1 200px;
+      max-width: 250px;
+    }
+
+    .campo label {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    .boton-filtrar {
+      padding: 8px 15px;
+      font-size: 14px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    .boton-filtrar:hover {
+      background-color: #256429;
+    }
+
+    .filtros-avanzados {
+      display: none;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .mostrar {
+      display: flex !important;
+    }
+
+    .toggle-avanzados {
+      background: none;
+      border: none;
+      color: #2e7d32;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    .imagen-miniatura {
+      max-width: 100%;
+      max-height: 150px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  </style>
+
+  <form method="POST" class="formulario-filtros">
+
+    <div class="campo">
+      <label for="desde">Desde</label>
+      <input type="date" id="desde" name="desde" value="{{ desde if request.method == 'POST' else '' }}">
     </div>
-    <div class="col-md-4">
-      <label for="hasta" class="form-label">Hasta</label>
-      <input type="date" id="hasta" name="hasta" value="{{ hasta if request.method == 'POST' else '' }}" class="form-control">
+
+    <div class="campo">
+      <label for="hasta">Hasta</label>
+      <input type="date" id="hasta" name="hasta" value="{{ hasta if request.method == 'POST' else '' }}">
     </div>
-    <div class="col-md-2 d-flex align-items-end">
-      <button type="submit" class="btn btn-success w-100">
+
+    <div style="width: 100%; text-align: center;">
+      <button type="button" class="toggle-avanzados" onclick="toggleAvanzados()">
+        ➕ Filtros Avanzados
+      </button>
+    </div>
+
+    <div class="filtros-avanzados" id="filtros-avanzados">
+      <div class="campo">
+        <label for="seccion">Sección</label>
+        <select id="seccion" name="seccion" onchange="filtrarAlumnos()">
+          <option value="">-- Todas --</option>
+          {% for seccion in secciones %}
+            <option value="{{ seccion }}" {% if seccion == seccion_actual %}selected{% endif %}>{{ seccion }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="estudiante">Estudiante</label>
+        <select id="estudiante" name="estudiante">
+          <option value="">-- Todos --</option>
+          {% for alumno in alumnos %}
+            <option value="{{ alumno.alumno }}" data-seccion="{{ alumno.seccion }}" {% if alumno.alumno == estudiante_actual %}selected{% endif %}>
+              {{ alumno.alumno }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="campo" style="align-self: flex-end;">
+      <button type="submit" class="boton-filtrar">
         <i class="bi bi-funnel-fill"></i> Filtrar
       </button>
     </div>
@@ -30,9 +138,19 @@
           <div class="col-md-6 mb-3">
             <div class="border rounded p-3 shadow-sm">
               {% for clave, valor in fila.items() %}
-                <p style="margin-bottom: 4px;">
-                  <strong>{{ 'Fecha/Hora' if clave == 'Timestamp' else clave }}:</strong> {{ valor }}
-                </p>
+                {% if clave == "Foto_Consecutivo" and valor %}
+                  {% set valor_str = valor|string %}
+                  <p style="margin-bottom: 4px;">
+                    <strong>📷 Foto:</strong><br>
+                    <a href="{{ url_for('static', filename='uploads/' + valor_str) }}" target="_blank">
+                      <img src="{{ url_for('static', filename='uploads/' + valor_str) }}" alt="Foto" class="imagen-miniatura">
+                    </a>
+                  </p>
+                {% elif clave != "Foto_Consecutivo" %}
+                  <p style="margin-bottom: 4px;">
+                    <strong>{{ 'Fecha/Hora' if clave == 'Timestamp' else clave }}:</strong> {{ valor }}
+                  </p>
+                {% endif %}
               {% endfor %}
               <hr style="border: none; border-top: 3px solid #2e7d32; margin: 10px 0;">
               <div style="text-align: center; font-size: 20px; color: #2e7d32;">📌</div>
@@ -47,4 +165,35 @@
     {% endif %}
   {% endif %}
 </div>
+
+<script>
+  function toggleAvanzados() {
+    const filtros = document.getElementById('filtros-avanzados');
+    filtros.classList.toggle('mostrar');
+  }
+
+  function filtrarAlumnos() {
+    const seccion = document.getElementById("seccion").value;
+    const estudiante = document.getElementById("estudiante");
+    const opciones = estudiante.querySelectorAll("option");
+
+    opciones.forEach(opcion => {
+      const seccionAlumno = opcion.getAttribute("data-seccion");
+      if (!seccion || !seccionAlumno || seccionAlumno === seccion || opcion.value === "") {
+        opcion.style.display = "block";
+      } else {
+        opcion.style.display = "none";
+      }
+    });
+
+    if (estudiante.selectedOptions.length) {
+      const seleccionado = estudiante.selectedOptions[0];
+      if (seleccionado.style.display === "none") {
+        estudiante.value = "";
+      }
+    }
+  }
+
+  window.onload = filtrarAlumnos;
+</script>
 {% endblock %}
