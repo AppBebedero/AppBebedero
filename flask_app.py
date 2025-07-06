@@ -234,5 +234,23 @@ def acerca():
         contenido_html = "<p>Error al cargar el contenido.</p>"
     return render_template('acerca.html', contenido=contenido_html)
 
+@app.route('/configuracion', methods=['GET', 'POST'])
+def configuracion():
+    mensaje = ""
+    if request.method == 'POST':
+        nuevo_config = {
+            "nombre_colegio": request.form.get("nombre_colegio", "").strip(),
+            "id_hoja_google": request.form.get("id_hoja_google", "").strip(),
+            "correo_notificaciones": request.form.get("correo_notificaciones", "").strip()
+        }
+        try:
+            with open(os.path.join(BASE_DIR, 'config.json'), 'w', encoding='utf-8') as f:
+                json.dump(nuevo_config, f, ensure_ascii=False, indent=2)
+            mensaje = "✅ Cambios guardados correctamente."
+        except Exception as e:
+            mensaje = f"❌ Error al guardar: {e}"
+
+    return render_template("configuracion.html", config=config, mensaje=mensaje)
+
 if __name__ == '__main__':
     app.run(debug=True)
