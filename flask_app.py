@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, url_for
+from flask import Flask, render_template, request, jsonify, url_for, redirect
 import csv
 import requests
 import os
@@ -8,13 +8,14 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import markdown
 from werkzeug.utils import secure_filename
+from config_loader import config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave-secreta'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --- Configuración para subir imágenes ---
+# --- Subida de imágenes ---
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -32,10 +33,7 @@ def obtener_secciones():
     return [fila[0] for fila in leer_csv('Secciones.csv') if fila]
 
 def obtener_alumnos(seccion_seleccionada=None):
-    alumnos = [
-        {"seccion": fila[0], "alumno": fila[1]}
-        for fila in leer_csv('Alumnos.csv') if len(fila) >= 2
-    ]
+    alumnos = [{"seccion": fila[0], "alumno": fila[1]} for fila in leer_csv('Alumnos.csv') if len(fila) >= 2]
     if seccion_seleccionada:
         alumnos = [a for a in alumnos if a["seccion"] == seccion_seleccionada]
     return sorted(alumnos, key=lambda x: x['alumno'])
@@ -56,7 +54,7 @@ def enviar_alerta_por_correo(info):
     try:
         remitente = 'alertas.bebedero@gmail.com'
         contrasena = 'xcvajtntwvgixkb'
-        destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'josedanny09@gmail.com']
+        destinatarios = [config.get('correo_notificaciones', ''), 'josedanny09@gmail.com']
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
 
         cuerpo = f"""
@@ -79,6 +77,10 @@ def enviar_alerta_por_correo(info):
             servidor.send_message(msg)
     except Exception as e:
         print("❌ Error al enviar correo:", e)
+
+# ================================
+# RUTAS PRINCIPALES
+# ================================
 
 @app.route('/')
 def inicio():
@@ -120,7 +122,7 @@ def formulario():
 
         try:
             respuesta = requests.post(
-                'https://script.google.com/macros/s/AKfycbyAvfjNACEkE7-2ASzqbVmMjqPJbVMwu2PjloGcfV6iYHkNclDAbuxETX8eo_U3DzAPLw/exec',
+                config['url_script'],  # ✅ Desde config.json
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -143,7 +145,7 @@ def formulario():
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
-    URL_CSV = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid=476352620"
+    URL_CSV = config.get("url_csv", "")
     seccion_actual = request.form.get("seccion", "").strip()
     estudiante_actual = request.form.get("estudiante", "").strip()
     desde_raw = request.form.get('desde', '').strip()
@@ -234,23 +236,29 @@ def acerca():
         contenido_html = "<p>Error al cargar el contenido.</p>"
     return render_template('acerca.html', contenido=contenido_html)
 
+# ✅ NUEVA VISTA: CONFIGURACIÓN
 @app.route('/configuracion', methods=['GET', 'POST'])
 def configuracion():
-    mensaje = ""
-    if request.method == 'POST':
-        nuevo_config = {
-            "nombre_colegio": request.form.get("nombre_colegio", "").strip(),
-            "id_hoja_google": request.form.get("id_hoja_google", "").strip(),
-            "correo_notificaciones": request.form.get("correo_notificaciones", "").strip()
-        }
-        try:
-            with open(os.path.join(BASE_DIR, 'config.json'), 'w', encoding='utf-8') as f:
-                json.dump(nuevo_config, f, ensure_ascii=False, indent=2)
-            mensaje = "✅ Cambios guardados correctamente."
-        except Exception as e:
-            mensaje = f"❌ Error al guardar: {e}"
+    clave = request.args.get('clave', '')
+    try:
+        with open(os.path.join(BASE_DIR, 'clave.txt'), 'r', encoding='utf-8') as f:
+            if f.read().strip() != clave:
+                return "🔒 Acceso denegado", 403
+    except:
+        return "🔒 Error al leer clave", 500
 
-    return render_template("configuracion.html", config=config, mensaje=mensaje)
+    # Leer hoja de configuración
+    url_csv = config.get("url_config_csv", "")
+    df = pd.read_csv(url_csv, index_col=0)
+    valores = df.to_dict()['valor']
+
+    if request.method == 'POST':
+        for campo in valores:
+            nuevo = request.form.get(campo, '').strip()
+            df.at[campo, 'valor'] = nuevo
+        df.to_csv(url_csv)  # Esto solo funciona si el CSV es editable (en local o Drive montado)
+
+    return render_template("configuracion.html", valores=valores)
 
 if __name__ == '__main__':
     app.run(debug=True)
