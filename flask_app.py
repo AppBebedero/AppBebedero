@@ -8,13 +8,14 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import markdown
 from werkzeug.utils import secure_filename
+from config_loader import config  # 🟢 Importar configuración
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave-secreta'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --- Configuración para subir imágenes ---
+# --- Subida de imágenes ---
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -32,10 +33,7 @@ def obtener_secciones():
     return [fila[0] for fila in leer_csv('Secciones.csv') if fila]
 
 def obtener_alumnos(seccion_seleccionada=None):
-    alumnos = [
-        {"seccion": fila[0], "alumno": fila[1]}
-        for fila in leer_csv('Alumnos.csv') if len(fila) >= 2
-    ]
+    alumnos = [{"seccion": fila[0], "alumno": fila[1]} for fila in leer_csv('Alumnos.csv') if len(fila) >= 2]
     if seccion_seleccionada:
         alumnos = [a for a in alumnos if a["seccion"] == seccion_seleccionada]
     return sorted(alumnos, key=lambda x: x['alumno'])
@@ -56,9 +54,11 @@ def enviar_alerta_por_correo(info):
     try:
         remitente = 'alertas.bebedero@gmail.com'
         contrasena = 'xcvajtntwvgixkb'
-        destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'josedanny09@gmail.com']
+        destinatarios = [
+            config.get('correo_notificaciones', ''),
+            'josedanny09@gmail.com'
+        ]
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
-
         cuerpo = f"""
 ⚠️ Se detectó un intento fallido de acceso a Reportes
 
@@ -68,7 +68,6 @@ def enviar_alerta_por_correo(info):
 🏢 Proveedor: {info['org']}
 📱 Dispositivo/Navegador: {info['user_agent']}
 """
-
         msg = MIMEText(cuerpo)
         msg['Subject'] = asunto
         msg['From'] = remitente
@@ -82,7 +81,7 @@ def enviar_alerta_por_correo(info):
 
 @app.route('/')
 def inicio():
-    return render_template('inicio.html')
+    return render_template('inicio.html', colegio=config.get("nombre_colegio", "Nombre no definido"))
 
 @app.route('/formulario', methods=['GET', 'POST'])
 def formulario():
@@ -120,7 +119,7 @@ def formulario():
 
         try:
             respuesta = requests.post(
-                'https://script.google.com/macros/s/AKfycbyAvfjNACEkE7-2ASzqbVmMjqPJbVMwu2PjloGcfV6iYHkNclDAbuxETX8eo_U3DzAPLw/exec',
+                'https://script.google.com/macros/s/AKfycbxJ8VgA0TBQDnevLsYde2TUSItxKA6AEuD-AEQ4XTtM0b1KiRq6ZuvvKU-9a7N9SVdU/exec',
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -143,7 +142,11 @@ def formulario():
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
-    URL_CSV = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid=476352620"
+    ID = config.get("id_hoja_google", "")
+    if not ID:
+        return render_template("reportes.html", registros=[], error="No se ha configurado el ID del archivo de Google Sheets")
+
+    URL_CSV = f"https://docs.google.com/spreadsheets/d/{ID}/export?format=csv&gid=476352620"
     seccion_actual = request.form.get("seccion", "").strip()
     estudiante_actual = request.form.get("estudiante", "").strip()
     desde_raw = request.form.get('desde', '').strip()
