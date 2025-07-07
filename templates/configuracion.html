@@ -10,24 +10,25 @@
         <div class="alert alert-info">{{ mensaje }}</div>
       {% endif %}
 
-      <div class="row">
-        {% for campo, valor in valores.items() %}
-        <div class="col-md-6 mb-4">
-          <label for="{{ campo }}" class="form-label fw-bold text-capitalize">
+      {% for campo, valor in valores.items() %}
+      <div class="row mb-3 align-items-center">
+        <div class="col-md-4 text-end pe-4">
+          <label for="{{ campo }}" class="form-label fw-bold text-capitalize" style="min-width: 200px;">
             {{ campo.replace('_', ' ') }}:
           </label>
+        </div>
+        <div class="col-md-8">
           <input 
             type="text" 
             class="form-control" 
             name="{{ campo }}" 
             id="{{ campo }}" 
             value="{{ valor }}" 
-            placeholder="Escriba aquí"
-            style="font-size: 0.95rem;"
+            style="width: 100%; font-size: 0.95rem;"
           >
         </div>
-        {% endfor %}
       </div>
+      {% endfor %}
 
       <div class="text-center mt-4">
         <button type="submit" class="btn btn-success btn-lg px-5">💾 Guardar Cambios</button>
@@ -36,4 +37,5 @@
   </div>
 </div>
 {% endblock %}
+
 
