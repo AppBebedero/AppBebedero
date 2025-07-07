@@ -4,16 +4,17 @@
 {% block content %}
 <div class="container mt-5 mb-5">
   <div class="card shadow p-4">
-    <h2 class="mb-4">⚙️ Configuración del Colegio</h2>
+    <h2 class="mb-4 text-center">⚙️ Configuración del Colegio</h2>
     <form method="POST" action="/configuracion?clave={{ clave }}">
       {% if mensaje %}
         <div class="alert alert-info">{{ mensaje }}</div>
       {% endif %}
 
-      {% for campo, valor in valores.items() %}
-        <div class="mb-4">
-          <label for="{{ campo }}" class="form-label">
-            {{ campo.replace('_', ' ').capitalize() }}:
+      <div class="row">
+        {% for campo, valor in valores.items() %}
+        <div class="col-md-6 mb-4">
+          <label for="{{ campo }}" class="form-label fw-bold text-capitalize">
+            {{ campo.replace('_', ' ') }}:
           </label>
           <input 
             type="text" 
@@ -22,14 +23,17 @@
             id="{{ campo }}" 
             value="{{ valor }}" 
             placeholder="Escriba aquí"
+            style="font-size: 0.95rem;"
           >
         </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
 
-      <div class="d-grid gap-2">
-        <button type="submit" class="btn btn-success btn-lg">💾 Guardar Cambios</button>
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success btn-lg px-5">💾 Guardar Cambios</button>
       </div>
     </form>
   </div>
 </div>
 {% endblock %}
+
