@@ -1,8 +1,8 @@
 {
-  "nombre_colegio": "Nombre del Colegio de Prueba",
-  "id_hoja_google": "ID_DE_LA_HOJA_DE_GOOGLE",
-  "correo_notificaciones": "correo@colegio.com",
-  "url_script": "https://script.google.com/macros/s/ID_DEL_SCRIPT/exec",
-  "url_csv": "https://docs.google.com/spreadsheets/d/e/ID_DEL_ARCHIVO_PARA_REPORTES/pub?output=csv",
+  "nombre_colegio": "Liceo de Bebedero",
+  "id_hoja_google": "1kIBRrKBoQtQjFVVMFEt6XFpq7ZhBa6GP553G5kB8808",
+  "correo_notificaciones": "alertas.liceobebedero@gmail.com",
+  "url_script": "https://script.google.com/macros/s/AKfycbxTfFAWOEJpuRvzIFuYHN0fIlvdWhXsUnbs3iSWkYb2VSNlp3hxonX1OaPXTkUPSTUm3A/exec",
+  "url_csv": "https://docs.google.com/spreadsheets/d/1kIBRrKBoQtQjFVVMFEt6XFpq7ZhBa6GP553G5kB8808/export?format=csv&gid=476352620",
   "url_config_csv": "https://docs.google.com/spreadsheets/d/1kIBRrKBoQtQjFVVMFEt6XFpq7ZhBa6GP553G5kB8808/export?format=csv&gid=855497726"
 }
