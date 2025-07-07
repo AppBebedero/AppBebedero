@@ -121,10 +121,8 @@ def formulario():
         }
 
         try:
-            respuesta = requests.post(
-                config['url_script'],
-                json=datos
-            )
+            respuesta = requests.post(config['url_script'], json=datos)
+            print("📥 Respuesta del script:", respuesta.text)  # Línea agregada
             if respuesta.status_code == 200 and "OK" in respuesta.text:
                 mensaje = "✅ ¡Alerta enviada correctamente!"
             else:
@@ -264,4 +262,5 @@ def configuracion():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
