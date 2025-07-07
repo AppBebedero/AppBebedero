@@ -39,7 +39,7 @@ def obtener_alumnos(seccion_seleccionada=None):
     return sorted(alumnos, key=lambda x: x['alumno'])
 
 def obtener_acciones():
-    return [fila[0] for fila in leer_csv('Acciones.csv') if fila]
+    return [fila[0] for fila in leer_csv('Accores.csv') if fila]
 
 def obtener_dimensiones():
     return [fila[0] for fila in leer_csv('Dimensiones.csv') if fila]
@@ -122,7 +122,7 @@ def formulario():
 
         try:
             respuesta = requests.post(
-                config['url_script'],  # ✅ Desde config.json
+                config['url_script'],
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -236,10 +236,13 @@ def acerca():
         contenido_html = "<p>Error al cargar el contenido.</p>"
     return render_template('acerca.html', contenido=contenido_html)
 
-# ✅ NUEVA VISTA: CONFIGURACIÓN
 @app.route('/configuracion', methods=['GET', 'POST'])
 def configuracion():
     clave = request.args.get('clave', '')
+
+    if not clave:
+        return render_template("configuracion_clave.html")
+
     try:
         with open(os.path.join(BASE_DIR, 'clave.txt'), 'r', encoding='utf-8') as f:
             if f.read().strip() != clave:
@@ -247,7 +250,6 @@ def configuracion():
     except:
         return "🔒 Error al leer clave", 500
 
-    # Leer hoja de configuración
     url_csv = config.get("url_config_csv", "")
     df = pd.read_csv(url_csv, index_col=0)
     valores = df.to_dict()['valor']
@@ -256,9 +258,9 @@ def configuracion():
         for campo in valores:
             nuevo = request.form.get(campo, '').strip()
             df.at[campo, 'valor'] = nuevo
-        df.to_csv(url_csv)  # Esto solo funciona si el CSV es editable (en local o Drive montado)
+        df.to_csv(url_csv)
 
-    return render_template("configuracion.html", valores=valores)
+    return render_template("configuracion.html", valores=valores, clave=clave)
 
 if __name__ == '__main__':
     app.run(debug=True)
