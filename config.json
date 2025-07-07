@@ -4,5 +4,5 @@
   "correo_notificaciones": "correo@colegio.com",
   "url_script": "https://script.google.com/macros/s/ID_DEL_SCRIPT/exec",
   "url_csv": "https://docs.google.com/spreadsheets/d/e/ID_DEL_ARCHIVO_PARA_REPORTES/pub?output=csv",
-  "url_config_csv": "https://script.google.com/macros/s/AKfycbwoLlwiqMLyIoec0Q1h431ZoR6Cgfj2v3F_DEZGyqZ7VGOWMMPGOKZOIIAyDMUtjeMQFA/exec"
+  "url_config_csv": "https://docs.google.com/spreadsheets/d/1kIBRrKBoQtQjFVVMFEt6XFpq7ZhBa6GP553G5kB8808/export?format=csv&gid=855497726"
 }
