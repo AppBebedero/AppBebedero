@@ -122,7 +122,7 @@ def formulario():
 
         try:
             respuesta = requests.post(config['url_script'], json=datos)
-            print("📥 Respuesta del script:", respuesta.text)  # Línea agregada
+            print("📥 Respuesta del script:", respuesta.text)
             if respuesta.status_code == 200 and "OK" in respuesta.text:
                 mensaje = "✅ ¡Alerta enviada correctamente!"
             else:
@@ -252,15 +252,18 @@ def configuracion():
     df = pd.read_csv(url_csv, index_col=0)
     valores = df.to_dict()['valor']
 
+    mensaje = ""
     if request.method == 'POST':
         for campo in valores:
             nuevo = request.form.get(campo, '').strip()
             df.at[campo, 'valor'] = nuevo
         df.to_csv(url_csv)
+        mensaje = "✅ Cambios guardados correctamente."
 
-    return render_template("configuracion.html", valores=valores, clave=clave)
+    return render_template("configuracion.html", valores=valores, clave=clave, mensaje=mensaje)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
