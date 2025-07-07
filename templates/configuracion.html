@@ -4,22 +4,18 @@
 {% block content %}
 <div class="container mt-4">
   <h2>⚙️ Configuración del Colegio</h2>
-  <form method="POST">
+  <form method="POST" action="/configuracion?clave={{ clave }}">
     {% if mensaje %}
       <div class="alert alert-info">{{ mensaje }}</div>
     {% endif %}
-    <div class="mb-3">
-      <label for="nombre_colegio" class="form-label">Nombre del Colegio:</label>
-      <input type="text" class="form-control" name="nombre_colegio" value="{{ config.get('nombre_colegio', '') }}">
-    </div>
-    <div class="mb-3">
-      <label for="id_hoja_google" class="form-label">ID Hoja de Google:</label>
-      <input type="text" class="form-control" name="id_hoja_google" value="{{ config.get('id_hoja_google', '') }}">
-    </div>
-    <div class="mb-3">
-      <label for="correo_notificaciones" class="form-label">Correo para notificaciones:</label>
-      <input type="email" class="form-control" name="correo_notificaciones" value="{{ config.get('correo_notificaciones', '') }}">
-    </div>
+
+    {% for campo, valor in valores.items() %}
+      <div class="mb-3">
+        <label for="{{ campo }}" class="form-label">{{ campo.replace('_', ' ').capitalize() }}:</label>
+        <input type="text" class="form-control" name="{{ campo }}" value="{{ valor }}">
+      </div>
+    {% endfor %}
+
     <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
   </form>
 </div>
