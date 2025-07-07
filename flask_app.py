@@ -39,7 +39,7 @@ def obtener_alumnos(seccion_seleccionada=None):
     return sorted(alumnos, key=lambda x: x['alumno'])
 
 def obtener_acciones():
-    return [fila[0] for fila in leer_csv('Accores.csv') if fila]
+    return [fila[0] for fila in leer_csv('Acciones.csv') if fila]
 
 def obtener_dimensiones():
     return [fila[0] for fila in leer_csv('Dimensiones.csv') if fila]
@@ -264,3 +264,4 @@ def configuracion():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
