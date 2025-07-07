@@ -1,22 +1,35 @@
 {% extends "base.html" %}
-{% block title %}Configuración{% endblock %}
+{% block title %}Configuración del Colegio{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2>⚙️ Configuración del Colegio</h2>
-  <form method="POST" action="/configuracion?clave={{ clave }}">
-    {% if mensaje %}
-      <div class="alert alert-info">{{ mensaje }}</div>
-    {% endif %}
+<div class="container mt-5 mb-5">
+  <div class="card shadow p-4">
+    <h2 class="mb-4">⚙️ Configuración del Colegio</h2>
+    <form method="POST" action="/configuracion?clave={{ clave }}">
+      {% if mensaje %}
+        <div class="alert alert-info">{{ mensaje }}</div>
+      {% endif %}
 
-    {% for campo, valor in valores.items() %}
-      <div class="mb-3">
-        <label for="{{ campo }}" class="form-label">{{ campo.replace('_', ' ').capitalize() }}:</label>
-        <input type="text" class="form-control" name="{{ campo }}" value="{{ valor }}">
+      {% for campo, valor in valores.items() %}
+        <div class="mb-4">
+          <label for="{{ campo }}" class="form-label">
+            {{ campo.replace('_', ' ').capitalize() }}:
+          </label>
+          <input 
+            type="text" 
+            class="form-control" 
+            name="{{ campo }}" 
+            id="{{ campo }}" 
+            value="{{ valor }}" 
+            placeholder="Escriba aquí"
+          >
+        </div>
+      {% endfor %}
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-success btn-lg">💾 Guardar Cambios</button>
       </div>
-    {% endfor %}
-
-    <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
-  </form>
+    </form>
+  </div>
 </div>
 {% endblock %}
