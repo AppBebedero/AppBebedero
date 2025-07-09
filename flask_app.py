@@ -116,7 +116,6 @@ def formulario():
             "observaciones": request.form.get("observaciones"),
             "consecutivo": consecutivo,
             "profesor": request.form.get("profesor"),
-            "timestamp": request.form.get("timestamp"),
             "Foto_Consecutivo": nombre_imagen
         }
 
@@ -264,6 +263,7 @@ def configuracion():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
