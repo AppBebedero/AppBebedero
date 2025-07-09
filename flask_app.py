@@ -78,10 +78,6 @@ def enviar_alerta_por_correo(info):
     except Exception as e:
         print("❌ Error al enviar correo:", e)
 
-# ================================
-# RUTAS PRINCIPALES
-# ================================
-
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
@@ -150,20 +146,23 @@ def reportes():
 
     try:
         df = pd.read_csv(URL_CSV)
-        df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+        df.columns = df.columns.str.strip()  # Limpia espacios en nombres de columnas
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
 
         if desde_raw:
-            desde = pd.to_datetime(desde_raw, format='%Y-%m-%d', errors='coerce').date()
+            desde = pd.to_datetime(desde_raw, errors='coerce').date()
             df = df[df['Timestamp'].dt.date >= desde]
 
         if hasta_raw:
-            hasta = pd.to_datetime(hasta_raw, format='%Y-%m-%d', errors='coerce').date()
+            hasta = pd.to_datetime(hasta_raw, errors='coerce').date()
             df = df[df['Timestamp'].dt.date <= hasta]
 
         if seccion_actual:
+            df['Sección'] = df['Sección'].astype(str).str.strip()
             df = df[df['Sección'] == seccion_actual]
 
         if estudiante_actual:
+            df['Nombre_Alumno'] = df['Nombre_Alumno'].astype(str).str.strip()
             df = df[df['Nombre_Alumno'] == estudiante_actual]
 
         df = df.sort_values(by='Timestamp', ascending=False)
@@ -263,7 +262,3 @@ def configuracion():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
