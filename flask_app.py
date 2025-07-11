@@ -234,5 +234,33 @@ def acerca():
         contenido_html = "<p>Error al cargar el contenido.</p>"
     return render_template('acerca.html', contenido=contenido_html)
 
+@app.route('/configuracion', methods=['GET', 'POST'])
+def cambiar_clave():
+    clave_path = os.path.join(BASE_DIR, "clave.txt")
+
+    if not os.path.exists(clave_path):
+        return "Archivo clave.txt no encontrado", 500
+
+    with open(clave_path, "r") as f:
+        clave_actual = f.read().strip()
+
+    if request.method == "POST":
+        clave_ingresada = request.form.get("clave_actual", "")
+        nueva_clave = request.form.get("nueva_clave", "")
+        confirmar_clave = request.form.get("confirmar_clave", "")
+
+        if clave_ingresada != clave_actual:
+            return render_template("cambiar_clave.html", error="❌ Clave anterior incorrecta.")
+        
+        if nueva_clave != confirmar_clave:
+            return render_template("cambiar_clave.html", error="❌ La nueva clave y su confirmación no coinciden.")
+
+        with open(clave_path, "w") as f:
+            f.write(nueva_clave.strip())
+
+        return render_template("cambiar_clave.html", success="✅ Clave actualizada correctamente.")
+
+    return render_template("cambiar_clave.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
