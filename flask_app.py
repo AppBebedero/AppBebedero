@@ -8,7 +8,6 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import markdown
 from werkzeug.utils import secure_filename
-from config_loader import config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave-secreta'
@@ -55,9 +54,10 @@ def obtener_profesores():
 
 def enviar_alerta_por_correo(info):
     try:
+        print("📤 Ejecutando función de envío de alerta por correo...")
         remitente = 'alertas.bebedero@gmail.com'
-        contrasena = 'xcvajtntwvgixkb'
-        destinatarios = config.get('correo_notificaciones', '').split(',')
+        contrasena = 'pyiekggsbfxecspc'  # contraseña de aplicación nueva
+        destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'alertas.bebedero@gmail.com']
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
 
         cuerpo = f"""
@@ -83,7 +83,7 @@ def enviar_alerta_por_correo(info):
 
 @app.route('/')
 def inicio():
-    return render_template('inicio.html', colegio=config.get("nombre_colegio", "Centro Educativo"))
+    return render_template('inicio.html')
 
 @app.route('/formulario', methods=['GET', 'POST'])
 def formulario():
@@ -121,7 +121,7 @@ def formulario():
 
         try:
             respuesta = requests.post(
-                config.get("url_script", ""),  # ← ahora es dinámico
+                'https://script.google.com/macros/s/AKfycbyAvfjNACEkE7-2ASzqbVmMjqPJbVMwu2PjloGcfV6iYHkNclDAbuxETX8eo_U3DzAPLw/exec',
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -144,7 +144,7 @@ def formulario():
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
-    URL_CSV = f"https://docs.google.com/spreadsheets/d/{config.get('id_hoja_google')}/export?format=csv&gid=476352620"
+    URL_CSV = "https://docs.google.com/spreadsheets/d/1SodhlgFh8lyzJ_e6h4UJhNlB9lDzKdIo9kpZ9M-oovY/export?format=csv&gid=476352620"
     seccion_actual = request.form.get("seccion", "").strip()
     estudiante_actual = request.form.get("estudiante", "").strip()
     desde_raw = request.form.get('desde', '').strip()
@@ -235,6 +235,33 @@ def acerca():
         contenido_html = "<p>Error al cargar el contenido.</p>"
     return render_template('acerca.html', contenido=contenido_html)
 
+@app.route('/configuracion', methods=['GET', 'POST'])
+def cambiar_clave():
+    clave_path = os.path.join(BASE_DIR, "clave.txt")
+
+    if not os.path.exists(clave_path):
+        return "Archivo clave.txt no encontrado", 500
+
+    with open(clave_path, "r") as f:
+        clave_actual = f.read().strip()
+
+    if request.method == "POST":
+        clave_ingresada = request.form.get("clave_actual", "")
+        nueva_clave = request.form.get("nueva_clave", "")
+        confirmar_clave = request.form.get("confirmar_clave", "")
+
+        if clave_ingresada != clave_actual:
+            return render_template("cambiar_clave.html", error="❌ Clave anterior incorrecta.")
+
+        if nueva_clave != confirmar_clave:
+            return render_template("cambiar_clave.html", error="❌ La nueva clave y su confirmación no coinciden.")
+
+        with open(clave_path, "w") as f:
+            f.write(nueva_clave.strip())
+
+        return render_template("cambiar_clave.html", success="✅ Clave actualizada correctamente.")
+
+    return render_template("cambiar_clave.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
-

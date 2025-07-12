@@ -8,6 +8,9 @@
   <!-- Íconos Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <!-- PWA: manifest y color de tema -->
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#2e7d32">
@@ -91,6 +94,9 @@
     #sidebar ul li a {
       color: #333;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     #sidebar ul li i {
@@ -142,6 +148,8 @@
       <li><a href="#" onclick="pedirClave()"><i class="bi bi-bar-chart-fill"></i>Reportes</a></li>
       <li><a href="/acerca"><i class="bi bi-info-circle-fill"></i>Acerca de esta App</a></li>
       <li><a href="/manual"><i class="bi bi-book-fill"></i>Manual de Uso</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('cambiar_clave') }}"><i class="bi bi-gear"></i> Configuración</a></li>
+
     </ul>
   </aside>
 
@@ -193,6 +201,9 @@
         .catch(err => console.error("❌ Error al registrar SW:", err));
     }
   </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 

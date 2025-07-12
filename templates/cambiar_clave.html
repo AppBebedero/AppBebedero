@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Cambiar Clave de Reportes{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="card shadow p-4">
+    <h2 class="text-center mb-4" style="font-size: 1.25rem;">🔐 Cambiar Clave de Reportes</h2>
+
+    {% if error %}
+      <div class="alert alert-danger text-center">{{ error }}</div>
+    {% elif success %}
+      <div class="alert alert-success text-center">{{ success }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="row mb-3 align-items-center">
+        <label for="clave_actual" class="col-sm-4 col-form-label text-start fw-bold">Clave anterior:</label>
+        <div class="col-sm-6">
+          <input type="password" class="form-control" id="clave_actual" name="clave_actual" required style="height: 42px;">
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <label for="nueva_clave" class="col-sm-4 col-form-label text-start fw-bold">Nueva clave:</label>
+        <div class="col-sm-6">
+          <input type="password" class="form-control" id="nueva_clave" name="nueva_clave" required style="height: 42px;">
+        </div>
+      </div>
+
+      <div class="row mb-4 align-items-center">
+        <label for="confirmar_clave" class="col-sm-4 col-form-label text-start fw-bold">Confirmar nueva:</label>
+        <div class="col-sm-6">
+          <input type="password" class="form-control" id="confirmar_clave" name="confirmar_clave" required style="height: 42px;">
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+          <a href="/" class="btn btn-danger px-3 py-1 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </a>
+          <button type="submit" class="btn btn-success px-3 py-1 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+            <i class="bi bi-check-circle me-1"></i>Guardar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
