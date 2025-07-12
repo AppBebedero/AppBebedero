@@ -54,9 +54,10 @@ def obtener_profesores():
 
 def enviar_alerta_por_correo(info):
     try:
+        print("📤 Ejecutando función de envío de alerta por correo...")  # Línea de prueba
         remitente = 'alertas.bebedero@gmail.com'
-        contrasena = 'xcvajtntwvgixkb'
-        destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'josedanny09@gmail.com']
+        contrasena = 'pyiekggsbfxecspc'  # NUEVA contraseña de aplicación
+        destinatarios = ['alejandra.quesada.soto@mep.go.cr', 'alertas.bebedero@gmail.com']
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
 
         cuerpo = f"""
@@ -79,7 +80,6 @@ def enviar_alerta_por_correo(info):
             servidor.send_message(msg)
     except Exception as e:
         print("❌ Error al enviar correo:", e)
-
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
