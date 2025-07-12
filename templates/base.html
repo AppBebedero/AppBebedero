@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Sistema de Alertas{% endblock %}</title>
 
-  <!-- Íconos Bootstrap -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <!-- Remix Icon (elegante y gratuito) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
 
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- PWA: manifest y color de tema -->
+  <!-- PWA -->
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#2e7d32">
 
@@ -50,10 +50,16 @@
     }
 
     .menu-icon {
-      font-size: 24px;
+      font-size: 26px;
       margin-right: 16px;
       cursor: pointer;
       color: white;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .menu-icon:hover {
+      transform: scale(1.3);
+      color: #FFD700;
     }
 
     #sidebar {
@@ -100,7 +106,13 @@
     }
 
     #sidebar ul li i {
-      margin-right: 8px;
+      font-size: 20px;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar ul li i:hover {
+      transform: scale(1.4);
+      color: #FFD700;
     }
 
     main {
@@ -126,9 +138,23 @@
     }
 
     nav i {
-      font-size: 20px;
+      font-size: 22px;
       display: block;
+      transition: transform 0.3s ease, color 0.3s ease;
     }
+
+    nav i:hover {
+      transform: scale(1.4);
+      color: #FFD700;
+    }
+
+    /* Colores base por ícono */
+    .ri-home-3-line { color: #2196F3; }
+    .ri-notification-3-line { color: #E91E63; }
+    .ri-bar-chart-line { color: #FF9800; }
+    .ri-information-line { color: #00BCD4; }
+    .ri-book-open-line { color: #4CAF50; }
+    .ri-settings-3-line { color: #9C27B0; }
   </style>
 </head>
 <body>
@@ -136,20 +162,19 @@
   <header>
     <img src="{{ url_for('static', filename='LogoTrans.png') }}" alt="Logo">
     <h1>{% block topbar_title %}Sistema de Alertas Tempranas{% endblock %}</h1>
-    <i class="bi bi-list menu-icon" onclick="toggleSidebar()"></i>
+    <i class="ri-menu-line menu-icon" onclick="toggleSidebar()"></i>
   </header>
 
   <!-- Menú lateral -->
   <aside id="sidebar">
     <div class="close-btn" onclick="toggleSidebar()">&times;</div>
     <ul>
-      <li><a href="/"><i class="bi bi-house-door-fill"></i>Inicio</a></li>
-      <li><a href="/formulario"><i class="bi bi-pencil-square"></i>Alertas</a></li>
-      <li><a href="#" onclick="pedirClave()"><i class="bi bi-bar-chart-fill"></i>Reportes</a></li>
-      <li><a href="/acerca"><i class="bi bi-info-circle-fill"></i>Acerca de esta App</a></li>
-      <li><a href="/manual"><i class="bi bi-book-fill"></i>Manual de Uso</a></li>
-      <li><a class="dropdown-item" href="{{ url_for('cambiar_clave') }}"><i class="bi bi-gear"></i> Configuración</a></li>
-
+      <li><a href="/"><i class="ri-home-3-line"></i>Inicio</a></li>
+      <li><a href="/formulario"><i class="ri-notification-3-line"></i>Alertas</a></li>
+      <li><a href="#" onclick="pedirClave()"><i class="ri-bar-chart-line"></i>Reportes</a></li>
+      <li><a href="/acerca"><i class="ri-information-line"></i>Acerca de esta App</a></li>
+      <li><a href="/manual"><i class="ri-book-open-line"></i>Manual de Uso</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('cambiar_clave') }}"><i class="ri-settings-3-line"></i>Configuración</a></li>
     </ul>
   </aside>
 
@@ -160,9 +185,9 @@
 
   <!-- Barra inferior -->
   <nav>
-    <a href="/"><i class="bi bi-house-door-fill"></i>Inicio</a>
-    <a href="/formulario"><i class="bi bi-pencil-square"></i>Alertas</a>
-    <a href="#" onclick="pedirClave()"><i class="bi bi-bar-chart-fill"></i>Reportes</a>
+    <a href="/"><i class="ri-home-3-line"></i>Inicio</a>
+    <a href="/formulario"><i class="ri-notification-3-line"></i>Alertas</a>
+    <a href="#" onclick="pedirClave()"><i class="ri-bar-chart-line"></i>Reportes</a>
   </nav>
 
   <!-- Scripts -->
@@ -194,7 +219,6 @@
       });
     }
 
-    // Registrar el Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/static/sw.js')
         .then(reg => console.log("✅ Service Worker registrado:", reg.scope))
@@ -206,4 +230,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
