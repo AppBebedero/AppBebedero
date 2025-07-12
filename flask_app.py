@@ -57,7 +57,10 @@ def enviar_alerta_por_correo(info):
     try:
         remitente = 'alertas.bebedero@gmail.com'
         contrasena = 'xcvajtntwvgixkb'
-        destinatarios = config.get('correo_notificaciones', '').split(',')
+        destinatarios = [
+            'alejandra.quesada.soto@mep.go.cr',
+            'alertas.bebedero@gmail.com'
+        ]
         asunto = '🔐 Intento de acceso no autorizado a Reportes'
 
         cuerpo = f"""
@@ -121,7 +124,7 @@ def formulario():
 
         try:
             respuesta = requests.post(
-                config.get("url_script", ""),  # ← ahora es dinámico
+                config.get("url_script", ""),
                 json=datos
             )
             if respuesta.status_code == 200 and "OK" in respuesta.text:
@@ -237,4 +240,5 @@ def acerca():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
